@@ -1,5 +1,6 @@
 
 const router = require('express').Router()
+const {authTokenAdmin} = require('../../middleware/authenticate')
 const {
     getUsers,
     getUserById,
@@ -9,10 +10,10 @@ const {
 } = require('../../controllers/user.controllers')
 
 
-router.get('/users', getUsers)
-router.get('/user/:id', getUserById)
-router.post('/users', createUser)
-router.put('/user/update/:id', updateUser)
-router.delete('/user/delete/:id', deleteUser)
+router.get('/users', authTokenAdmin, getUsers)
+router.get('/user/:id', authTokenAdmin, getUserById)
+router.post('/users', authTokenAdmin, createUser)
+router.put('/user/update/:id', authTokenAdmin, updateUser)
+router.delete('/user/delete/:id', authTokenAdmin, deleteUser)
 
 module.exports = router
