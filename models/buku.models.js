@@ -44,6 +44,9 @@ const Buku = db.define(
                 notEmpty: true,
             },
         },
+        img_url: {
+            type: DataTypes.STRING,
+        },
         status: {
             type: DataTypes.BOOLEAN,
             defaultValue: true,

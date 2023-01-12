@@ -5,13 +5,22 @@ const { DataTypes } = Sequelize;
 
 const User = db.define(
     "users",
-    {
+    { 
         id: {
             type: DataTypes.STRING(20),
             primaryKey: true,
             allowNull: false,
             validate: {
                 notEmpty: true,
+            },
+        },
+        username: {
+            type: DataTypes.STRING(30),
+            unique: true,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+                len: [3, 100],
             },
         },
         nama: {

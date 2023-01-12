@@ -5,19 +5,20 @@ const { Op } = require('sequelize');
 // POST user
 exports.createUser = async (req, res) => {
     try {
-        const {nama, email, password, role} = req.body
-        // Bcrypt password
-        const salt = bcrypt.genSaltSync(10);
-        const has = bcrypt.hashSync(password, salt)
+        const {username, nama, email, password, role} = req.body
         // check apakah email sudah digunakan
         const check = await User.findOne({
-            where: {email}
+            where: {
+                [Op.or]: [{username}, {email}]
+            }
         })
-        if (check) {
-            return res.status(409).json({message: 'email telah terdaftar'})
-        }
+        // Bcrypt password
+        if (check) return res.status(409).json({message: 'email telah terdaftar'})
+        const salt = bcrypt.genSaltSync(10);
+        const has = bcrypt.hashSync(password, salt)
         await User.create({
             id: Date.now(),
+            username,
             nama,
             email,
             password: has,
@@ -55,7 +56,7 @@ exports.getUsers = async (req, res) => {
         const totalPage = Math.ceil(totalRows / limit)
         // cari anggota sesuai nama atau email
         const users = await User.findAll({
-            attributes: ['id', 'nama', 'email', 'role', 'skor_kredit', 'status', 'createdAt'],
+            attributes: ['id', 'username', 'nama', 'email', 'role', 'skor_kredit', 'status', 'createdAt'],
             where: {
                 [Op.or]: [
                     {
@@ -89,7 +90,7 @@ exports.getUserById = async (req, res) => {
     try {
         const {id} = req.params
         const user = await User.findByPk(id, {
-            attributes: ['id', 'nama', 'email', 'role', 'skor_kredit', 'status', 'createdAt'],
+            attributes: ['id', 'username', 'nama', 'email', 'role', 'skor_kredit', 'status', 'createdAt'],
         })
         if (!user) {
             return res.status(404).json({message: `id=${id} tidak di temukan`})
@@ -107,7 +108,7 @@ exports.getUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         const { id } = req.params
-        const { nama, email, password, role } = req.body
+        const { username, nama, email, password, role } = req.body
 
         const user = await User.findByPk(id, { attributes: ['id'] })
         if (!user) {
@@ -120,6 +121,7 @@ exports.updateUser = async (req, res) => {
         await User.update({
             where: { id }
         }, {
+            username,
             nama,
             email,
             password: has,

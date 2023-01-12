@@ -2,7 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const session = require("express-session");
+
+// Auth routes
+const auth = require('./routes/auth.routes')
 
 // Admin router
 const userControl = require('./routes/admin/user.routes')
@@ -27,17 +29,6 @@ dotenv.config();
 // runn();
 
 const app = express();
-
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            secure: "auto",
-        },
-    })
-);
 
 // List url yang di setujui oleh cors
 let allowList = [process.env.URL1, process.env.URL2];
@@ -65,6 +56,9 @@ app.get("/", (req, res) => {
         message: `Hello World`,
     });
 });
+
+// Router authentication
+app.use('/api/v1/auth', auth)
 
 // Router Admin mengelola User
 app.use('/api/v1/admin', userControl)
