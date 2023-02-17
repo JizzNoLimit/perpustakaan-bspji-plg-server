@@ -24,7 +24,7 @@ const User = db.define(
             },
         },
         nama: {
-            type: DataTypes.STRING(30),
+            type: DataTypes.STRING(100),
             allowNull: false,
             validate: {
                 notEmpty: true,
@@ -32,7 +32,7 @@ const User = db.define(
             },
         },
         email: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(100),
             unique: true,
             allowNull: false,
             unique: true,

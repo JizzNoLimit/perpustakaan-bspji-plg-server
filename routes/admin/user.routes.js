@@ -12,8 +12,8 @@ const {
 
 router.get('/users', authTokenAdmin, getUsers)
 router.get('/user/:id', authTokenAdmin, getUserById)
-router.post('/users', authTokenAdmin, createUser)
+router.post('/users',  createUser)
 router.put('/user/update/:id', authTokenAdmin, updateUser)
-router.delete('/user/delete/:id', authTokenAdmin, deleteUser)
+router.delete('/user/delete', authTokenAdmin, deleteUser)
 
 module.exports = router

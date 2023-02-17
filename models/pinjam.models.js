@@ -16,8 +16,18 @@ const Pinjam = db.define(
                 notEmpty: true,
             },
         },
+        tgl_pinjam: {
+            type: DataTypes.BIGINT,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
+        tgl_kembali: {
+            type: DataTypes.BIGINT
+        },
         batas_pinjam: {
-            type: DataTypes.DATE,
+            type: DataTypes.BIGINT,
             allowNull: false,
             validate: {
                 notEmpty: true
@@ -28,17 +38,24 @@ const Pinjam = db.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
             allowNull: false
+        },
+        // Keterangan pengembalian
+        ket_pengembalian: {
+            type: DataTypes.STRING
         }
     },
     {
         freezeTableName: true,
+        timestamps: false
     }
 );
 
-// Relationship buku - pinjam
-Buku.hasMany(Pinjam)
-
 // Relationship user - pinjam
 User.hasMany(Pinjam)
+Pinjam.belongsTo(User)
+
+// Relationship buku - Pinjam
+Buku.hasMany(Pinjam)
+Pinjam.belongsTo(Buku)
 
 module.exports = Pinjam;

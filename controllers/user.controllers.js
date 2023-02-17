@@ -1,6 +1,8 @@
 const User = require('../models/user.models')
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
+const Pinjam = require('../models/pinjam.models');
+const Buku = require('../models/buku.models');
 
 // POST user
 exports.createUser = async (req, res) => {
@@ -9,7 +11,9 @@ exports.createUser = async (req, res) => {
         // check apakah email sudah digunakan
         const check = await User.findOne({
             where: {
-                [Op.or]: [{username}, {email}]
+                [Op.or]: [
+                    {username}, {email}
+                ]
             }
         })
         // Bcrypt password
@@ -50,7 +54,8 @@ exports.getUsers = async (req, res) => {
                     }, {
                         email: { [Op.like]: '%' + search + '%' }
                     }
-                ]
+                ],
+                role: 'user'
             }
         })
         const totalPage = Math.ceil(totalRows / limit)
@@ -64,7 +69,7 @@ exports.getUsers = async (req, res) => {
                     }, {
                         email: { [Op.like]: '%' + search + '%' }
                     }
-                ]
+                ],
             },
             offset ,
             limit,
@@ -73,6 +78,7 @@ exports.getUsers = async (req, res) => {
             ]
             
         })
+        
         res.status(200).json({
             data: users, 
             message: "anggota perpustakaan bspji palembang",
@@ -90,7 +96,7 @@ exports.getUserById = async (req, res) => {
     try {
         const {id} = req.params
         const user = await User.findByPk(id, {
-            attributes: ['id', 'username', 'nama', 'email', 'role', 'skor_kredit', 'status', 'createdAt'],
+            attributes: {exclude: ['password']},
         })
         if (!user) {
             return res.status(404).json({message: `id=${id} tidak di temukan`})
@@ -108,29 +114,20 @@ exports.getUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         const { id } = req.params
-        const { username, nama, email, password, role } = req.body
-
-        const user = await User.findByPk(id, { attributes: ['id'] })
-        if (!user) {
-            return res.status(404).json({ message: `id=${id} tidak di temukan` })
-        }
-        // Bcrypt password
-        const salt = bcrypt.genSaltSync(10);
-        const has = bcrypt.hashSync(password, salt)
+        const { username, nama, email, role } = req.body
 
         await User.update({
-            where: { id }
-        }, {
             username,
             nama,
             email,
-            password: has,
             role,
             status: true
+        }, {
+            where: { id }
         })
 
         res.status(200).json({
-            message: `data berhasil di ubah`
+            message: `data berhasil di ubah ${id}`
         })
     } catch (error) {
         console.error(error)
@@ -140,7 +137,7 @@ exports.updateUser = async (req, res) => {
 // DELETE user
 exports.deleteUser = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.query
 
         const user = await User.findByPk(id, { attributes: ['id'] })
         if (!user) {
@@ -156,5 +153,54 @@ exports.deleteUser = async (req, res) => {
         })
     } catch (error) {
         console.error(error)
+    }
+}
+
+exports.getUserRealation = async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await User.findByPk(id, {
+            attributes: { exclude: ['password'] },
+            include: [Buku, Pinjam]
+        })
+        if (!user) {
+            return res.status(404).json({ message: `id=${id} tidak di temukan` })
+        }
+        res.status(200).json({
+            data: user,
+            message: `anggota yang memiliki id ${id}`
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+exports.getDataUser = async (req, res) => {
+    try {
+        const {id} = req.params
+        const user = await User.findOne({
+            where: {
+                id
+            }
+        })
+        const pinjamCount = await Pinjam.count({
+            where: {
+                userId: id
+            },
+        })
+        const pinjam = await Pinjam.findAll({
+            where: {
+                userId: id
+            },
+            include: [User, Buku]
+        })
+
+        res.status(200).json({
+            pinjam,
+            pinjamCount
+
+        })
+    } catch (error) {
+        console.error(error);
     }
 }

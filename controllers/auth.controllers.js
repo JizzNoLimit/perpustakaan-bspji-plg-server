@@ -2,13 +2,14 @@ const User = require('../models/user.models')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
+const Pinjam = require('../models/pinjam.models');
 
 
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body
         const user = await User.findOne({
-            where: {email}
+            where: {email},
         })
         if (!user) {return res.status(401).json({message: "email tidak ditemukan"})}
         const match = await bcrypt.compare(password, user.password)
@@ -19,6 +20,7 @@ exports.login = async (req, res) => {
             username: user.username,
             email: user.email,
             role: user.role,
+            skor_kredit: user.skor_kredit
         }, process.env.TOKEN_SECRET,{
             expiresIn: '1d'
         })

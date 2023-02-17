@@ -1,6 +1,5 @@
 const { Sequelize } = require("sequelize");
 const db = require("../config/db.config");
-const BukuDetail = require('./bukuDetail.models')
 
 const { DataTypes } = Sequelize;
 
@@ -24,25 +23,71 @@ const Buku = db.define(
             },
         },
         judul: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
             },
         },
         pengarang: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
             },
         },
         penerbit: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
             },
+        },
+        isbn: {
+            type: DataTypes.STRING(25),
+            unique: true,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        bahasa: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        tahun: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        edisi: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        fisik: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        kategori: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
+        },
+        desk: {
+            type: DataTypes.TEXT
         },
         img_url: {
             type: DataTypes.STRING,
@@ -60,8 +105,6 @@ const Buku = db.define(
         freezeTableName: true,
     }
 );
-
-BukuDetail.hasOne(Buku)
 
 
 module.exports = Buku;
